@@ -17,5 +17,5 @@ Executable meta
 
     Build-Depends: 
                     parsec,
-                    Step >= 0.2,
+                    Summit >= 0.2,
                     base

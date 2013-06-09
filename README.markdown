@@ -5,8 +5,7 @@ To build and run the project, you will need:
  * Haskell
  * cabal
  * llvm
- * OpenGL
- * GLFW
+ * Summit (https://github.com/RobotGymnast/Summit)
 
 You can set up the build environment by running
 
@@ -23,9 +22,9 @@ When the environment has been successfully set up, the project can be built with
 
 # Running
 
-After a successful build, the game can be run from
+After a successful build, the executable can be run from
 
-    dist/build/Game2D/Game2D
+    dist/build/meta/meta
 
 # Documentation
 
@@ -36,9 +35,6 @@ Haddock documentation can be generated using
 By default, the documentation is generated to `dist/docs/html/`
 
 # Code Standards
-
-The `Util` and `Wrappers` folders are for code which is *not project-specific*:
-Direct library wraps go into `Wrappers/`, and useful generic functions and modules go in `Util/`.
 
 Coding is a language. You are expressing ideas, so they should be as clear, concise, and elegant as possible.
 

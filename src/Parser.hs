@@ -2,7 +2,7 @@ module Parser ( parser
               , Chunk (..)
               ) where
 
-import Prelewd hiding (join)
+import Prelewd hiding (join, try)
 
 import Data.Char
 import Data.Maybe (catMaybes)
@@ -15,23 +15,20 @@ type Code = Text
 data Chunk = Data Data
            | Code Code
 
--- end of input as a Monoid
-end :: Monoid a => Parser a
-end = eof $> mempty
-
 -- `anyChar` as a singleton list
 anyChars :: Parser [Char]
 anyChars = anyChar <&> (:[])
 
 infixl 6 `until`
 
-until :: Monoid a => Parser a -> Parser a -> Parser a
-until act s = end
-            <|> try s $> mempty
+-- | act `until` stop performs act repeatedly until we reach stop or end, concatenating the values.
+until :: Monoid a => Parser a -> Parser b -> Parser a
+until act s = (eof $> mempty)
+            <|> (try s $> mempty)
             <|> act <&> (<>) <*> until act s
 
 parser :: Parser [Chunk]
-parser = catMaybes <$> sequence chunks `until` end
+parser = catMaybes <$> sequence chunks `until` eof
 
 chunks :: [Parser (Maybe Chunk)]
 chunks = [ make Data $ anyChars `until` string "{-@"
@@ -39,4 +36,4 @@ chunks = [ make Data $ anyChars `until` string "{-@"
          ]
 
 make :: (Text -> Chunk) -> Parser Text -> Parser (Maybe Chunk)
-make f = map $ bool Nothing <$> Just . f <*> not.null
+make f = map $ iff <$> not . null <*> Just . f <*> pure Nothing

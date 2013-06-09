@@ -1,19 +1,26 @@
 #!/bin/bash
 
-dir=`pwd`
+dir=/tmp/testbuild/`pwd | sed "s/.*\///g"`
+if [ -d "$dir" ]; then
+    rm -rf "$dir"/.git
+    echo Re-using build environment in "$dir"
+else
+    rm -rf "$dir" &&
+    echo Creating temporary build environment in "$dir"
+fi &&
 
-rm -rf /tmp/testbuild &&
-cp -r ./ /tmp/testbuild &&
-cd /tmp/testbuild &&
+mkdir -p "$dir"
+cp -r --preserve=timestamps . "$dir" &&
+cd "$dir" &&
 rm -f .git/hooks/pre-commit &&
-git commit -m "Temp" &&
-git reset --hard HEAD &&
-git clean -fd &&
+git commit -m "Temp" > /dev/null &&
+git reset --hard HEAD > /dev/null &&
+git clean -fd > /dev/null &&
+scripts/setup.sh &&
 scripts/build.sh &&
 echo &&
-scripts/linecheck.sh
-
-ret=$?
-
-cd "$dir"
-exit $ret
+scripts/test.sh &&
+echo &&
+scripts/linecheck.sh &&
+echo &&
+rm -rf "$dir"
