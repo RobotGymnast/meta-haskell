@@ -36,9 +36,8 @@ output (Data s) = return s
 output (Code s) = do
         system "rm -f /tmp/meta-haskell* /tmp/out.txt"
         writeCode "/tmp/meta-haskell.hs" s
-        rawSystem "ghc" ["/tmp/meta-haskell.hs"]
-        system "/tmp/meta-haskell > /tmp/out.txt"
+        system "runhaskell < /tmp/meta-haskell.hs > /tmp/out.txt"
         readFile "/tmp/out.txt"
 
 writeCode :: Text -> Text -> IO ()
-writeCode file s = writeFile file $ "module Main ( main ) where\nout = " <> s <> "\n\nmain = putStr out"
+writeCode file s = writeFile file $ "main = putStr $ " <> s
