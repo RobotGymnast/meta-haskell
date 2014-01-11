@@ -2,7 +2,7 @@ Name:                Meta-Haskell
 Version:             0.1
 Description:         Parser to embed Haskell in text
 Category:            
-License-file:        LICENSE
+License-file:        PublicDomain
 Author:              Ben Foppa
 Maintainer:          benjamin.foppa@gmail.com
 Build-Type:          Simple
