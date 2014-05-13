@@ -5,3 +5,5 @@
 
 dist
 docs
+.cabal-sandbox
+cabal.sandbox.config
