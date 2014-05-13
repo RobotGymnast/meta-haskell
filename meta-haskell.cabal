@@ -1,21 +1,18 @@
-Name:                Meta-Haskell
-Version:             0.1
-Description:         Parser to embed Haskell in text
-Category:            
-License-file:        PublicDomain
-Author:              Ben Foppa
-Maintainer:          benjamin.foppa@gmail.com
-Build-Type:          Simple
-Cabal-Version:       >= 1.9.2
+Name:           Meta-Haskell
+Version:        0.2
+Synopsis:    Parser to embed Haskell in text files
+License:        BSD3
+Author:         Ben Foppa
+Maintainer:     benjamin.foppa@gmail.com
+Build-Type:     Simple
+Cabal-Version:  >= 1.9.2
 
 Executable meta
     hs-source-dirs:    src/
     Main-is:           Main.hs
     GHC-Options:       -Wall -Werror -threaded -rtsopts=all -fllvm
-    Extensions:        FlexibleInstances, TupleSections, TemplateHaskell, GeneralizedNewtypeDeriving, NoImplicitPrelude,
-                       BangPatterns, ExistentialQuantification, MultiParamTypeClasses, FlexibleContexts
 
     Build-Depends: 
                     parsec,
-                    Summit >= 0.2,
+                    process == 1.2.*,
                     base

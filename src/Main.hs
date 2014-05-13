@@ -1,43 +1,49 @@
 module Main ( main
             ) where
 
-import Prelewd
-import IO
-
-import Storage.List
+import Control.Arrow
+import Data.Foldable
+import Data.List
+import Data.Monoid
 import Text.Parsec hiding ((<?>))
 import Text.Parsec.String
 import Text.Parsec.Error
 
+import System.Environment
+import System.Process (system)
+
 import Parser
 
-main :: SystemIO ()
-main = runIO $ do
+main :: IO ()
+main = do
         args <- getArgs
-        (concatMap . process <$> head args <*> tail args) <?> usage
+        case args of
+          [] -> usage
+          (outputPrefix:files) -> traverse_ (process outputPrefix) files
 
 usage :: IO ()
 usage = putStrLn "usage: meta output-prefix files.."
 
-process :: Text -> Text -> IO ()
+process :: String -> String -> IO ()
 process prefix inFile = let file = prefix <> "/" <> inFile
                         in system ("rm -f " <> file)
-                        >> io (parseFromFile parser inFile)
-                        >>= either propogateError (concatMap $ outputChunk file)
+                        >> parseFromFile parser inFile
+                        >>= either propogateError (traverse_ $ outputChunk file)
 
 propogateError :: ParseError -> IO ()
-propogateError = putStrLn . intercalate "\n" . ("Errors occurred:" :) . map messageString . errorMessages
+propogateError =  errorMessages
+              >>> map messageString
+              >>> ("Errors occurred:" :)
+              >>> intercalate "\n"
+              >>> putStrLn
 
-outputChunk :: Text -> Chunk -> IO ()
+outputChunk :: String -> Chunk -> IO ()
 outputChunk file c = output c >>= appendFile file
 
-output :: Chunk -> IO Text
+output :: Chunk -> IO String
 output (Data s) = return s
 output (Code s) = do
-        system "rm -f /tmp/meta-haskell* /tmp/out.txt"
-        writeCode "/tmp/meta-haskell.hs" s
-        system "runhaskell < /tmp/meta-haskell.hs > /tmp/out.txt"
+        _ <- system "rm -f /tmp/meta-haskell* /tmp/out.txt"
+        writeFile "/tmp/meta-haskell.hs" s
+        _ <- system "runhaskell < /tmp/meta-haskell.hs > /tmp/out.txt"
         readFile "/tmp/out.txt"
-
-writeCode :: Text -> Text -> IO ()
-writeCode file s = writeFile file $ "main = putStr $ " <> s
